@@ -21,11 +21,17 @@ export default function AdminPage() {
   const [allowed, setAllowed] = useState<boolean | null>(null);
   const [tab, setTab] = useState<Tab>('stats');
 
-  useEffect(() => {
-    // Check admin access
+ useEffect(() => {
+    const initData = window.Telegram?.WebApp?.initData;
+    console.log('initData:', initData);
+    console.log('user:', window.Telegram?.WebApp?.initDataUnsafe?.user);
+    
     adminGetStats()
       .then(() => setAllowed(true))
-      .catch(() => setAllowed(false));
+      .catch((e) => {
+        console.log('error:', e.message);
+        setAllowed(false);
+      });
   }, []);
 
   if (allowed === null) {
