@@ -47,7 +47,9 @@ export default function HomePage() {
         </main>
 
         <footer className="text-center pb-6 text-xs text-gray-700">
-          All payments in TON
+  All payments in TON
+  <br/>
+  <a href="/admin" className="text-gray-800 text-xs">⚙️</a>
         </footer>
       </div>
     </>
