@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --tg-theme-bg-color: #000000;
+  --tg-theme-text-color: #ffffff;
+  --tg-theme-hint-color: #aaaaaa;
+  --tg-theme-link-color: #FF0000;
+  --tg-theme-button-color: #FF0000;
+  --tg-theme-button-text-color: #ffffff;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  background-color: #000000;
+  color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: #111;
+}
+::-webkit-scrollbar-thumb {
+  background: #FF0000;
+  border-radius: 2px;
+}
+
+/* TON Connect modal override */
+[data-tc-modal] {
+  --tc-background: #111111 !important;
+  --tc-text-primary: #ffffff !important;
+  --tc-text-secondary: #aaaaaa !important;
+  --tc-accent: #FF0000 !important;
+}

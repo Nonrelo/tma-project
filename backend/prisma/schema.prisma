@@ -1,0 +1,80 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id         Int      @id @default(autoincrement())
+  telegramId String   @unique
+  createdAt  DateTime @default(now())
+}
+
+model Account {
+  id          Int      @id @default(autoincrement())
+  country     String
+  countryCode String
+  flag        String
+  quantity    Int
+  price       Float    // in TON
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  orders      Order[]
+}
+
+model Username {
+  id         Int       @id @default(autoincrement())
+  username   String    @unique
+  priceDay   Float
+  priceWeek  Float
+  priceMonth Float
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  rentals    Rental[]
+}
+
+model Order {
+  id            Int      @id @default(autoincrement())
+  accountId     Int
+  account       Account  @relation(fields: [accountId], references: [id])
+  telegramId    String
+  walletAddress String
+  tonAmount     Float
+  boc           String   // raw transaction BOC
+  txHash        String?  @unique
+  status        OrderStatus @default(PENDING)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Rental {
+  id            Int      @id @default(autoincrement())
+  usernameId    Int
+  username      Username @relation(fields: [usernameId], references: [id])
+  telegramId    String
+  walletAddress String
+  period        RentalPeriod
+  tonAmount     Float
+  boc           String
+  txHash        String?  @unique
+  status        OrderStatus @default(PENDING)
+  startsAt      DateTime?
+  expiresAt     DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  FAILED
+}
+
+enum RentalPeriod {
+  DAY
+  WEEK
+  MONTH
+}
