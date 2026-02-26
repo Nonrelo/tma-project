@@ -31,7 +31,7 @@ app.use(limiter);
 
 app.use(express.json({ limit: '1mb' }));
 
-app.get('/health', (_req, res) => res.json({ ok: true }));
+app.get('/health', (_req, res) => res.json({ ok: true, version: '2.0' }));
 
 app.use('/accounts', accountsRouter);
 app.use('/usernames', usernamesRouter);
