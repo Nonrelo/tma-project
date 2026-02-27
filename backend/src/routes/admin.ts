@@ -23,7 +23,7 @@ router.get('/rentals', requireAdmin, async (_req: Request, res: Response) => {
 });
 
 // GET /admin/stats
-router.get('/stats', async (_req: Request, res: Response) => {
+router.get('/stats', requireAdmin, async (_req: Request, res: Response) => {
   const [totalOrders, confirmedOrders, totalRentals, confirmedRentals] = await Promise.all([
     prisma.order.count(),
     prisma.order.count({ where: { status: 'CONFIRMED' } }),
