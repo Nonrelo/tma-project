@@ -24,7 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           strategy="beforeInteractive"
         />
         <TonConnectUIProvider
-          manifestUrl={`${process.env.NEXT_PUBLIC_APP_URL}/tonconnect-manifest.json`}
+          manifestUrl="https://tma-project-ten.vercel.app/tonconnect-manifest.json"
         >
           {children}
         </TonConnectUIProvider>
