@@ -24,6 +24,8 @@ interface TonTransaction {
 export async function sendBocAndGetHash(boc: string): Promise<string> {
   try {
     const resp = await axios.post(`${TON_API_BASE}/sendBocReturnHash`, { boc }, {
+
+
       headers: { 'X-API-Key': TON_API_KEY },
       timeout: 15000,
     });
@@ -40,6 +42,8 @@ export async function sendBocAndGetHash(boc: string): Promise<string> {
 
   // Вернуть хэш из BOC напрямую
   return crypto.createHash('sha256').update(Buffer.from(boc, 'base64')).digest('hex');
+
+
 }
 
 /**
@@ -65,8 +69,6 @@ export async function verifyTonTransaction(params: {
   // Poll for up to 60 seconds (12 * 5s)
   for (let attempt = 0; attempt < 12; attempt++) {
     await sleep(5000);
-
-
 
     try {
       const resp = await axios.get(`${TON_API_BASE}/getTransactions`, {
@@ -150,4 +152,3 @@ export async function verifyTransactionByAddress(params: {
 
 function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
-}
