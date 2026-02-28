@@ -57,17 +57,16 @@ export async function verifyTonTransaction(params: {
   tolerancePercent?: number;
 }): Promise<{ verified: boolean; tx?: TonTransaction }> {
   const {
-    txHash,
     expectedDestination,
     expectedValueTon,
-    tolerancePercent = 1,
+    tolerancePercent = 2,
   } = params;
 
   const expectedNano = BigInt(Math.round(expectedValueTon * 1e9));
   const tolerance = (expectedNano * BigInt(tolerancePercent)) / 100n;
+  const startTime = Math.floor(Date.now() / 1000) - 300; // последние 5 минут
 
-  // Poll for up to 60 seconds (12 * 5s)
-  for (let attempt = 0; attempt < 12; attempt++) {
+  for (let attempt = 0; attempt < 15; attempt++) {
     await sleep(5000);
 
     try {
@@ -85,11 +84,10 @@ export async function verifyTonTransaction(params: {
       const txs: TonTransaction[] = resp.data.result;
 
       const match = txs.find((tx) => {
-        if (tx.hash !== txHash) return false;
-        const value = BigInt(tx.in_msg.value);
-        const diff = value - expectedNano;
-        const absDiff = diff < 0n ? -diff : diff;
-        return absDiff <= tolerance;
+        if (tx.utime < startTime) return false;
+        const value = BigInt(tx.in_msg?.value || '0');
+        const diff = value > expectedNano ? value - expectedNano : expectedNano - value;
+        return diff <= tolerance;
       });
 
       if (match) {
@@ -98,11 +96,6 @@ export async function verifyTonTransaction(params: {
     } catch (err) {
       console.error('TON API poll error:', err);
     }
-  }
-
-  return { verified: false };
-}
-
 /**
  * Alternative: verify by wallet address + checking recent txs for the BOC hash.
  * Use this when sendBocReturnHash is not available.
