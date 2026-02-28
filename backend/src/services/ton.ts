@@ -24,12 +24,10 @@ interface TonTransaction {
 export async function sendBocAndGetHash(boc: string): Promise<string> {
   try {
     const resp = await axios.post(`${TON_API_BASE}/sendBocReturnHash`, { boc }, {
-    const resp = await axios.post(`${TON_API_BASE}/sendBoc`, { boc }, {
       headers: { 'X-API-Key': TON_API_KEY },
       timeout: 15000,
     });
     if (resp.data.ok) return resp.data.result.hash as string;
-    if (resp.data.ok) return 'pending_' + Date.now();
   } catch {}
 
   // Fallback — просто отправить BOC и вернуть заглушку
@@ -42,7 +40,6 @@ export async function sendBocAndGetHash(boc: string): Promise<string> {
 
   // Вернуть хэш из BOC напрямую
   return crypto.createHash('sha256').update(Buffer.from(boc, 'base64')).digest('hex');
-  return 'pending_' + Date.now();
 }
 
 /**
@@ -62,27 +59,20 @@ export async function verifyTonTransaction(params: {
     tolerancePercent = 1,
   } = params;
 
-}): Promise<{ verified: boolean }> {
-  const { expectedDestination, expectedValueTon } = params;
   const expectedNano = BigInt(Math.round(expectedValueTon * 1e9));
   const tolerance = (expectedNano * BigInt(tolerancePercent)) / 100n;
 
   // Poll for up to 60 seconds (12 * 5s)
   for (let attempt = 0; attempt < 12; attempt++) {
     await sleep(5000);
-  const tolerance = expectedNano / 50n; // 2%
-  const startTime = Math.floor(Date.now() / 1000) - 120; // последние 2 минуты
 
-  for (let i = 0; i < 15; i++) {
-    await new Promise(r => setTimeout(r, 5000));
+
+
     try {
       const resp = await axios.get(`${TON_API_BASE}/getTransactions`, {
         params: {
           address: expectedDestination,
           limit: 20,
-        params: { 
-          address: expectedDestination, 
-          limit: 10,
         },
         headers: { 'X-API-Key': TON_API_KEY },
         timeout: 10_000,
@@ -133,7 +123,6 @@ export async function verifyTransactionByAddress(params: {
         params: { address: destinationAddress, limit: 20 },
         headers: { 'X-API-Key': TON_API_KEY },
         timeout: 10_000,
-        timeout: 10000,
       });
 
       if (!resp.data.ok) continue;
@@ -146,11 +135,6 @@ export async function verifyTransactionByAddress(params: {
         const diff = value - expectedNano;
         const absDiff = diff < 0n ? -diff : diff;
         return absDiff <= tolerance;
-      const match = resp.data.result.find((tx: any) => {
-        if (tx.utime < startTime) return false;
-        const value = BigInt(tx.in_msg?.value || '0');
-        const diff = value > expectedNano ? value - expectedNano : expectedNano - value;
-        return diff <= tolerance;
       });
 
       if (match) {
@@ -158,9 +142,6 @@ export async function verifyTransactionByAddress(params: {
       }
     } catch (err) {
       console.error('TON API poll error:', err);
-      if (match) return { verified: true };
-    } catch (e) {
-      console.log('TON verify error:', e);
     }
   }
 
