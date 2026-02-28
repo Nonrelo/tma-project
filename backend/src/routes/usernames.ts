@@ -143,8 +143,12 @@ router.post('/:id/rent', requireInitData, async (req: Request, res: Response) =>
   });
 
  setImmediate(async () => {
-    // Временно авто-подтверждение для теста
-    const verified = true;
+    const { verified } = await verifyTonTransaction({
+      txHash,
+      expectedDestination: process.env.MERCHANT_WALLET!,
+      expectedValueTon: tonAmount,
+    });
+
     if (verified) {
       const now = new Date();
       const periodMs: Record<string, number> = {
