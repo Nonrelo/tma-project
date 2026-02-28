@@ -102,8 +102,12 @@ router.post('/:id/buy', requireInitData, async (req: Request, res: Response) => 
 
   // Verify in background
   setImmediate(async () => {
-    // Временно авто-подтверждение для теста
-    const verified = true;
+    const { verified } = await verifyTonTransaction({
+      txHash,
+      expectedDestination: process.env.MERCHANT_WALLET!,
+      expectedValueTon: tonAmount,
+    });
+
     if (verified) {
       await prisma.$transaction([
         prisma.order.update({ where: { id: order.id }, data: { status: 'CONFIRMED' } }),
